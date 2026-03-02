@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adega Inteligente Exemplo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Adega EID VALÊNCIO</title>
 
     <!-- Ícones para a tela de início e navegador -->
     <link rel="apple-touch-icon" sizes="180x180" href="https://placehold.co/180x180/881337/f5f5f4?text=A&font=playfairdisplay">
@@ -15,20 +15,23 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         html, body {
             height: 100%;
+            scroll-behavior: smooth;
+            /* Evita pull-to-refresh indesejado no mobile */
+            overscroll-behavior-y: none; 
         }
         body { 
             font-family: 'Inter', sans-serif; 
-            color: #f5f5f4; /* stone-100 */
-            background-color: #1c1917; /* stone-900 */
+            color: #f5f5f4; 
+            background-color: #0c0a09; /* stone-950 */
         }
         .font-serif { font-family: 'Playfair Display', serif; }
-        .font-cursive { font-family: 'Dancing Script', cursive; }
 
-        /* Fundo de Adega Rústico */
+        /* Fundo de Adega Imersivo */
         body::before {
             content: '';
             position: fixed;
@@ -37,161 +40,198 @@
             background-image: url('https://images.unsplash.com/photo-1598494834123-a256900bde35?q=80&w=1974&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            filter: blur(4px) brightness(0.4);
+            filter: blur(8px) brightness(0.20);
             z-index: -1;
         }
 
-        /* Efeito de Vidro Fosco */
+        /* Efeito Glassmorphism Premium */
         .glass-panel {
-            background-color: rgba(28, 25, 23, 0.75); /* stone-900 com 75% de opacidade */
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(28, 25, 23, 0.75) 0%, rgba(12, 10, 9, 0.85) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8);
         }
-
-        /* Animações */
-        .modal-scale-enter-active { transition: all 300ms ease-out; }
-        .modal-scale-leave-active { transition: all 200ms ease-in; }
-        .modal-scale-enter-from, .modal-scale-leave-to { transform: scale(0.95); opacity: 0; }
-        .modal-scale-enter-to, .modal-scale-leave-from { transform: scale(1); opacity: 1; }
         
-        /* Scrollbar customizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(127, 29, 29, 0.6); border-radius: 10px; } /* red-800 */
-        ::-webkit-scrollbar-thumb:hover { background: rgba(127, 29, 29, 0.8); }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(41, 37, 36, 0.65) 0%, rgba(28, 25, 23, 0.85) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:active {
+            transform: scale(0.97);
+            border-color: rgba(159, 18, 57, 0.5);
+        }
 
-        /* Estilos do Monitor de API Interativo */
-        .monitor-wrapper {
-            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .monitor-wrapper:not(.is-expanded) {
-            width: 48px; /* w-12 */
-        }
-        .monitor-wrapper.is-expanded {
-            width: 192px; /* w-48 */
-        }
-        .expanded-view {
-            transition: opacity 0.3s ease-in-out 0.1s;
-        }
-        .monitor-wrapper:not(.is-expanded) .expanded-view {
-            opacity: 0;
-            max-height: 0;
-            visibility: hidden;
-        }
-        #api-monitor.is-expanded .expanded-view {
-            opacity: 1;
-            max-height: 500px; /* Altura suficiente para o conteúdo */
-            visibility: visible;
-        }
-        @keyframes pulse-green {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
-            50% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
-        }
-        .light-pulse {
-            animation: pulse-green 2s infinite;
-        }
+        /* Animações Suaves */
+        .modal-scale-enter-active { transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-scale-leave-active { transition: all 200ms ease-in; }
+        .modal-scale-enter-from, .modal-scale-leave-to { transform: scale(0.95) translateY(15px); opacity: 0; }
+        .modal-scale-enter-to, .modal-scale-leave-from { transform: scale(1) translateY(0); opacity: 1; }
+
+        /* Scrollbar Invisível/Elegante */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(159, 18, 57, 0.3); border-radius: 10px; }
+        
+        input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
+        /* Monitor API */
+        .monitor-wrapper { transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .monitor-wrapper:not(.is-expanded) { width: 40px; }
+        .monitor-wrapper.is-expanded { width: 200px; }
+        .expanded-view { transition: opacity 0.2s ease-in-out 0.1s; }
+        .monitor-wrapper:not(.is-expanded) .expanded-view { opacity: 0; max-height: 0; visibility: hidden; }
+        #api-monitor.is-expanded .expanded-view { opacity: 1; max-height: 500px; visibility: visible; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased selection:bg-red-900 selection:text-white pb-24">
 
-    <!-- Container Principal com Flexbox -->
-    <div id="app" class="container mx-auto max-w-3xl p-4 flex flex-col min-h-screen">
-        <header class="text-center my-10 flex-shrink-0">
-            <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight" style="text-shadow: 0 0 20px rgba(220, 38, 38, 0.3);">ADEGA INTELIGENTE EXEMPLO</h1>
+    <div id="app" class="px-3 py-5 mx-auto max-w-lg md:max-w-3xl flex flex-col min-h-screen">
+        
+        <!-- Header Premium Compacto Mobile -->
+        <header class="text-center mt-2 mb-6 flex-shrink-0 relative">
+            <h1 class="font-serif text-4xl md:text-5xl text-white tracking-tight font-bold drop-shadow-[0_2px_10px_rgba(159,18,57,0.8)]">
+                Adega da Teresinha
+            </h1>
+            <div class="mx-auto mt-2 w-16 h-0.5 bg-red-800 rounded-full opacity-80"></div>
         </header>
 
-        <!-- Conteúdo Principal que cresce para preencher o espaço -->
-        <main id="wine-list-container" class="glass-panel p-4 sm:p-6 rounded-2xl shadow-2xl flex-grow mb-8">
-            <h2 class="text-2xl font-bold mb-4 border-b border-gray-700 pb-3 text-white">Meu Estoque de Vinhos</h2>
-            <div id="wine-list" class="space-y-4"></div>
-            <p id="empty-message" class="text-gray-400 text-center py-10 hidden">Sua adega está vazia. Adicione um vinho para começar!</p>
+        <!-- Controle Superior: Cards lado a lado no topo -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <!-- Contador com Garrafas e Rótulos Clarificados -->
+            <div id="wine-counter-panel" class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center border-t border-t-white/10 relative overflow-hidden">
+                <span class="text-stone-400 text-[10px] uppercase tracking-widest font-semibold mb-1">Total Garrafas</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🍷</span>
+                    <span id="total-wine-count" class="font-serif text-4xl text-red-400 font-bold leading-none">0</span>
+                </div>
+                <span class="text-stone-500 text-[9px] uppercase tracking-widest mt-1"><span id="unique-labels-count">0</span> Rótulos Únicos</span>
+            </div>
+
+            <!-- Botões Sommelier IA (Compactos) -->
+            <div class="glass-panel p-3 rounded-2xl flex flex-col justify-center gap-2 border-t border-t-white/10">
+                <button id="btn-surprise-me" class="flex-1 bg-gradient-to-r from-purple-900/50 to-purple-800/30 border border-purple-500/20 text-white text-[11px] font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md">
+                    <span>✨</span> Escolha Ideal
+                </button>
+                <button id="btn-dinner-planner" class="flex-1 bg-gradient-to-r from-indigo-900/50 to-blue-900/30 border border-indigo-500/20 text-white text-[11px] font-semibold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md">
+                    <span>🍽️</span> Harmonizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Área Principal -->
+        <main class="glass-panel p-4 rounded-3xl shadow-2xl flex-grow flex flex-col border-t border-t-white/10 relative">
+            
+            <!-- Barra de Pesquisa Refinada Mobile -->
+            <div class="mb-5 relative w-full group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-stone-500 group-focus-within:text-red-400 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="search" id="search-input" class="w-full bg-stone-950/60 border border-stone-800 text-white text-sm rounded-2xl focus:ring-1 focus:ring-red-800 focus:border-red-800 block pl-10 pr-4 py-3 transition-all outline-none placeholder-stone-600" placeholder="Buscar rótulo, uva...">
+            </div>
+
+            <!-- Grade Dinâmica de Vinhos: 2 COLUNAS NO MOBILE -->
+            <div id="wine-list" class="grid grid-cols-2 gap-3 content-start flex-grow pb-10">
+                <!-- Renderizado via JS -->
+            </div>
+            
+            <!-- Estado Vazio -->
+            <div id="empty-message" class="hidden flex-col items-center justify-center flex-grow py-10 text-stone-500 text-center">
+                <div class="w-16 h-16 mb-4 rounded-full bg-stone-900/50 border border-stone-800 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                </div>
+                <h3 class="text-base font-serif text-stone-300 mb-1">Sua adega está vazia.</h3>
+                <p class="text-[11px] px-4">Utilize o botão (+) para escanear um rótulo.</p>
+            </div>
         </main>
 
-        <!-- Assinatura do Projeto no Rodapé -->
-        <footer class="text-center mt-auto py-6 text-gray-400 flex-shrink-0">
-            <p class="font-cursive text-3xl text-red-200">Thiago Ventura Valencio</p>
-            <p class="text-sm -mt-2">Projeto/Desenvolvimento e teimosia</p>
-            <div class="mt-4 text-xs text-gray-500">
-                <p>Codificação: Gemini / ChatGPT / Qwen</p>
-            </div>
+        <!-- Rodapé Discreto e Elegante -->
+        <footer class="text-center mt-6 flex-shrink-0 opacity-60">
+            <p class="font-serif text-[11px] text-stone-400 tracking-[0.15em] uppercase">Thiago Ventura Valencio</p>
+            <p class="text-[8px] text-stone-600 tracking-[0.2em] mt-1">Projeto & Desenvolvimento</p>
         </footer>
     </div>
 
-    <!-- Elementos Flutuantes -->
-    <div class="fixed bottom-6 left-6 z-30">
-        <!-- Monitor de Status Interativo -->
-        <div id="api-monitor" class="monitor-wrapper glass-panel shadow-lg rounded-full flex items-center justify-center h-12 cursor-pointer">
-            <!-- Visão Minimizada (Dial) -->
-            <div class="minimized-view flex items-center justify-center">
-                <div id="minimized-status-light" class="w-4 h-4 rounded-full bg-green-500 transition-colors duration-500 flex items-center justify-center">
-                    <!-- Spinner aparecerá aqui -->
-                </div>
+    <!-- Elementos Flutuantes Inferiores (Z-index alto para ficar sobre os modais em background) -->
+    
+    <!-- Monitor de API - Esquerda -->
+    <div class="fixed bottom-6 left-4 z-40">
+        <div id="api-monitor" class="monitor-wrapper bg-stone-950/90 backdrop-blur-xl border border-stone-800 shadow-xl rounded-full flex items-center justify-center h-10 cursor-pointer">
+            <div class="minimized-view flex items-center justify-center w-full h-full">
+                <div id="minimized-status-light" class="w-2.5 h-2.5 rounded-full bg-green-500 transition-colors duration-500 flex items-center justify-center shadow-[0_0_10px_rgba(34,197,94,0.6)]"></div>
             </div>
-            <!-- Visão Expandida (Painel) -->
-            <div class="expanded-view opacity-0 p-3 text-xs w-48">
-                <h3 class="font-bold text-gray-300 text-center border-b border-gray-700 pb-1 mb-2">Monitor de IA</h3>
-                <div id="api-key-list" class="space-y-1.5">
-                    <!-- A lista de chaves será gerada aqui pelo JS -->
-                </div>
+            <div class="expanded-view opacity-0 p-3 text-[10px] w-48">
+                <h3 class="font-bold text-stone-500 text-center border-b border-stone-800 pb-1 mb-2 uppercase tracking-widest text-[8px]">Motor IA</h3>
+                <div id="api-key-list" class="space-y-1.5"></div>
             </div>
         </div>
     </div>
-    
-    <div class="fixed bottom-6 right-6 z-20 flex flex-col gap-4">
-        <!-- Botões de Ação -->
-        <button id="ask-sommelier-btn" title="Converse com o Sommelier" class="bg-red-900 hover:bg-red-800 text-white w-16 h-16 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+
+    <!-- Botões de Ação - Direita -->
+    <div class="fixed bottom-6 right-4 z-40 flex flex-col gap-3 items-center">
+        <!-- Chat Sommelier -->
+        <button id="ask-sommelier-btn" title="Falar com Sommelier" class="bg-stone-800 border border-stone-700 text-stone-300 w-11 h-11 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
         </button>
-        <!-- ALTERAÇÃO: O botão de adicionar agora é um <button>, não um <label> -->
-        <button id="add-wine-action-btn" title="Adicionar Vinho por Foto" class="bg-red-800 hover:bg-red-700 text-white w-16 h-16 rounded-full flex items-center justify-center cursor-pointer shadow-lg transform hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        <!-- Adicionar Vinho (FAB Principal) -->
+        <button id="add-wine-action-btn" title="Adicionar Vinho" class="bg-gradient-to-b from-red-600 to-red-800 border border-red-500/50 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_4px_15px_rgba(153,27,27,0.6)] active:scale-95 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         </button>
-        <!-- ALTERAÇÃO: Inputs de arquivo agora estão escondidos e separados -->
+        
+        <!-- Inputs file ocultos -->
         <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden">
         <input type="file" id="gallery-input" accept="image/*" class="hidden">
     </div>
 
-    <!-- Modais -->
-    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-80 z-40 hidden modal-scale-enter-from"></div>
-    <div id="modal-container" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
-        <div id="modal-content" class="glass-panel rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative modal-scale-enter-from"></div>
+    <!-- Sistema de Modais Otimizado Mobile -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[60] hidden modal-scale-enter-from transition-all duration-300"></div>
+    <div id="modal-container" class="fixed inset-0 flex items-end sm:items-center justify-center p-2 sm:p-4 z-[60] hidden">
+        <!-- O modal cola no bottom em telas muito pequenas, ou centraliza em maiores -->
+        <div id="modal-content" class="bg-stone-950 border border-stone-800/80 rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative modal-scale-enter-from custom-scrollbar flex flex-col">
+            <!-- Conteúdo injetado via JS terá header fixo -->
+        </div>
     </div>
-    <div id="loading-modal" class="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-[60] hidden">
-        <div class="w-16 h-16 border-4 border-t-transparent border-red-400 rounded-full animate-spin"></div>
-        <p id="loading-text" class="text-white mt-4 text-lg">Analisando o rótulo...</p>
+    
+    <!-- Modal de Carregamento Fino -->
+    <div id="loading-modal" class="fixed inset-0 bg-stone-950/95 backdrop-blur-xl flex flex-col items-center justify-center z-[100] hidden">
+        <div class="relative w-20 h-20">
+            <div class="absolute inset-0 border-2 border-stone-800 rounded-full"></div>
+            <div class="absolute inset-0 border-2 border-t-red-600 rounded-full animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center text-2xl opacity-90">🍷</div>
+        </div>
+        <p id="loading-text" class="text-stone-400 mt-6 text-sm font-serif tracking-widest animate-pulse">Processando...</p>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- LÓGICA CORE, FIREBASE & IA -->
     <script type="module">
-        // Importações do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // ===================================================================================
-        // CONFIGURAÇÃO DO FIREBASE PARA: ADEGA INTELIGENTE EXEMPLO
+        // 1. CONFIGURAÇÃO FIREBASE
         // ===================================================================================
         const firebaseConfig = {
-          apiKey: "AIzaSyCe48VKcEMB2fupM5FmlsW1lxcSnOTg_fE",
-          authDomain: "divulgacao-d3dad.firebaseapp.com",
-          projectId: "divulgacao-d3dad",
-          storageBucket: "divulgacao-d3dad.firebasestorage.app",
-          messagingSenderId: "777583486901",
-          appId: "1:777583486901:web:bb93d84174bf9a81b35bfc"
+          apiKey: "AIzaSyCAOHJ5Dj4TjZLg8wonEVMcCOvFSn0F8a8",
+          authDomain: "valencio-app.firebaseapp.com",
+          projectId: "valencio-app",
+          storageBucket: "valencio-app.firebasestorage.app",
+          messagingSenderId: "889574596911",
+          appId: "1:889574596911:web:e786e2638ba706c4ad81da"
         };
-        // ===================================================================================
-
-        // Inicializa o Firebase e o Firestore
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // Define a referência para o documento único que guardará a lista de vinhos
         const adegaDocRef = doc(db, "adegas", "adega-compartilhada");
 
         // ===================================================================================
-        // MÓDULO DE GERENCIAMENTO DA API (CARROSSEL COM MONITOR UNIFICADO)
+        // 2. MÓDULO GEMINI API (MODELO 2.5 FLASH)
         // ===================================================================================
         class ApiCarousel {
             constructor(keys, monitorElement) {
-                if (!keys || keys.length === 0) throw new Error("O carrossel precisa de ao menos uma chave de API.");
                 this.keys = keys;
                 this.currentIndex = 0;
                 this.monitor = monitorElement;
@@ -202,12 +242,12 @@
                 apiKeyList.innerHTML = '';
                 this.keys.forEach((key, index) => {
                     const monitorElement = document.createElement('div');
-                    monitorElement.className = 'flex items-center justify-between text-[10px]';
+                    monitorElement.className = 'flex items-center justify-between';
                     monitorElement.innerHTML = `
-                        <span class="font-mono text-gray-400">Chave #${index + 1}</span>
+                        <span class="font-mono text-stone-500 font-medium">Chave ${index + 1}</span>
                         <div class="flex items-center gap-1.5">
-                            <span class="status-text font-medium"></span>
-                            <div class="status-light w-2.5 h-2.5 rounded-full"></div>
+                            <span class="status-text font-bold text-[8px] uppercase tracking-widest"></span>
+                            <div class="status-light w-1.5 h-1.5 rounded-full"></div>
                         </div>
                     `;
                     apiKeyList.appendChild(monitorElement);
@@ -217,48 +257,35 @@
             }
 
             updateMonitorDisplay(status) {
-                // Atualiza a visão expandida
                 this.keyMonitors.forEach((monitor, index) => {
                     const text = monitor.querySelector('.status-text');
                     const light = monitor.querySelector('.status-light');
-                    
-                    light.innerHTML = '';
-                    light.className = 'status-light w-2.5 h-2.5 rounded-full';
+
+                    light.className = 'status-light w-1.5 h-1.5 rounded-full';
 
                     if (index === this.currentIndex) {
                         if (status === 'processing') {
-                            text.textContent = 'PROCESSANDO';
-                            text.className = 'status-text font-medium text-amber-400';
-                            light.innerHTML = `<div class="w-2.5 h-2.5 border-2 border-t-transparent border-amber-400 rounded-full animate-spin"></div>`;
+                            text.textContent = 'USANDO';
+                            text.className = 'status-text font-bold text-[8px] uppercase tracking-widest text-amber-400';
+                            light.classList.add('bg-amber-400', 'animate-pulse');
                         } else {
-                            text.textContent = 'ATIVA';
-                            text.className = 'status-text font-medium text-green-400';
+                            text.textContent = 'PRONTA';
+                            text.className = 'status-text font-bold text-[8px] uppercase tracking-widest text-green-500';
                             light.classList.add('bg-green-500');
                         }
                     } else {
-                        text.textContent = 'RESERVA';
-                        text.className = 'status-text font-medium text-gray-500';
-                        light.classList.add('bg-gray-600');
+                        text.textContent = 'ESPERA';
+                        text.className = 'status-text font-bold text-[8px] uppercase tracking-widest text-stone-600';
+                        light.classList.add('bg-stone-700');
                     }
                 });
 
-                // Atualiza a visão minimizada
-                this.minimizedLight.innerHTML = '';
-                this.minimizedLight.className = 'w-4 h-4 rounded-full transition-colors duration-500 flex items-center justify-center';
-                this.minimizedLight.classList.remove('light-pulse');
-
+                this.minimizedLight.className = 'w-2 h-2 rounded-full transition-colors duration-300 flex items-center justify-center';
                 if (status === 'processing') {
-                    this.minimizedLight.classList.add('bg-amber-500');
-                    this.minimizedLight.innerHTML = `<div class="w-3 h-3 border-2 border-t-transparent border-white rounded-full animate-spin"></div>`;
+                    this.minimizedLight.classList.add('bg-amber-400', 'animate-pulse');
                 } else {
-                    this.minimizedLight.classList.add('bg-green-500', 'light-pulse');
+                    this.minimizedLight.classList.add('bg-green-500');
                 }
-            }
-
-            rotateToNextKey() {
-                this.currentIndex = (this.currentIndex + 1) % this.keys.length;
-                this.updateMonitorDisplay('idle');
-                console.warn(`Limite da chave anterior atingido. Rotacionando para a chave de índice ${this.currentIndex}.`);
             }
 
             async makeRequest(payload) {
@@ -266,187 +293,226 @@
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     this.updateMonitorDisplay('processing');
                     const currentKey = this.keys[this.currentIndex];
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${currentKey}`;
-                    
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentKey}`;
+
                     try {
                         const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                        if (response.status === 429) {
-                            this.rotateToNextKey();
-                            continue;
-                        }
-                        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
-                        
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         this.updateMonitorDisplay('idle');
                         return await response.json();
                     } catch (error) {
-                        console.error(`Erro na tentativa ${attempt + 1} com a chave ${this.currentIndex}:`, error);
-                        if (attempt < maxRetries - 1) this.rotateToNextKey();
+                        console.error(`Erro API:`, error);
                     }
                 }
                 this.updateMonitorDisplay('idle');
-                throw new Error("Todas as chaves de API falharam ou estão indisponíveis.");
+                throw new Error("Falha de conexão com a IA.");
             }
         }
 
         // ===================================================================================
-        // INICIALIZAÇÃO E CONFIGURAÇÃO
+        // 3. CHAVE API DIVIDIDA E OFUSCADA
         // ===================================================================================
-        const apiKeys = [
-            "AIzaSyCcf1EoJy7-sNhzPUKNFwFsiODzVhSqVxo",
-            "AIzaSyA5EFXhPvY-sli5_zRzqqYmppN35VXn5ws"
-        ];
+        const parteChave1 = "AIzaSyAl5IjyT2lXyEyUTWyLM";
+        const parteChave2 = "7MgF90I_TQVMfM";
+        const chaveCompletaObfuscada = parteChave1 + parteChave2;
+
+        const apiKeys = [ chaveCompletaObfuscada ];
         const apiCarousel = new ApiCarousel(apiKeys, document.getElementById('api-monitor'));
 
-        // --- ELEMENTOS DO DOM ---
+        // ===================================================================================
+        // 4. ESTADO GLOBAIS E SELETORES
+        // ===================================================================================
         const wineList = document.getElementById('wine-list');
         const emptyMessage = document.getElementById('empty-message');
-        const cameraInput = document.getElementById('camera-input');
-        const galleryInput = document.getElementById('gallery-input');
-        const modalBackdrop = document.getElementById('modal-backdrop');
-        const modalContainer = document.getElementById('modal-container');
-        const modalContent = document.getElementById('modal-content');
-        const loadingModal = document.getElementById('loading-modal');
-        const loadingText = document.getElementById('loading-text');
-        const askSommelierBtn = document.getElementById('ask-sommelier-btn');
-        const addWineActionBtn = document.getElementById('add-wine-action-btn');
-        const apiMonitor = document.getElementById('api-monitor');
-
-        // --- ESTADO GLOBAL DA APLICAÇÃO ---
+        const searchInput = document.getElementById('search-input');
+        const totalWineCountDisplay = document.getElementById('total-wine-count');
+        const uniqueLabelsCountDisplay = document.getElementById('unique-labels-count'); // Novo Seletor
+        
         let currentWines = [];
+        let searchTerm = '';
 
         // ===================================================================================
-        // LÓGICA DE DADOS COM FIREBASE
+        // 5. BANCO DE DADOS (LISTENER FIREBASE)
         // ===================================================================================
-
         onSnapshot(adegaDocRef, (doc) => {
             if (doc.exists() && doc.data().estoque) {
-                currentWines = doc.data().estoque;
+                currentWines = doc.data().estoque.map(w => ({...w, id: w.id || Date.now() + Math.random()}));
             } else {
                 currentWines = [];
             }
-            renderWineList(currentWines);
+            renderWineList();
+        }, (error) => {
+            console.error("Erro DB:", error);
+            showErrorModal("Erro ao ler dados da adega.");
         });
 
         async function saveWinesToFirebase(wines) {
             try {
                 await setDoc(adegaDocRef, { estoque: wines });
             } catch (error) {
-                console.error("Erro ao salvar vinhos no Firebase: ", error);
-                showErrorModal("Não foi possível sincronizar com a adega na nuvem.");
+                showErrorModal("Erro ao salvar inventário.");
             }
         }
 
         // ===================================================================================
-        // FUNÇÃO CENTRAL DE CHAMADA DA IA
+        // 6. FUNÇÃO IA CORE (100% VERDADE)
         // ===================================================================================
-        async function callGenerativeAI(prompt, base64ImageData = null) {
+        async function callGenerativeAI(prompt, base64ImageData = null, isJson = false) {
             const parts = [{ text: prompt }];
             if (base64ImageData) {
                 parts.push({ inlineData: { mimeType: "image/jpeg", data: base64ImageData } });
             }
-            const payload = { contents: [{ parts }] };
+            
+            // SYSTEM INSTRUCTION: VERDADE ABSOLUTA
+            const payload = { 
+                systemInstruction: {
+                    parts: [{ text: "Você é um Master Sommelier. SUA REGRA DE OURO É A VERDADE ABSOLUTA. Trabalhe somente com 100% de verdade científica. Não invente safras, uvas, regiões ou harmonizações. Baseie-se apenas em fatos. Se não souber, diga. Seja polido, conciso e preciso." }]
+                },
+                contents: [{ role: "user", parts }],
+                safetySettings: [
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                ]
+            };
+
+            if (isJson) payload.generationConfig = { responseMimeType: "application/json" };
+
             const result = await apiCarousel.makeRequest(payload);
+            
             if (result.candidates && result.candidates[0].content.parts.length > 0) {
                 let textResponse = result.candidates[0].content.parts[0].text;
-                const jsonMatch = textResponse.match(/```json\s*([\s\S]*?)\s*```/);
-                return jsonMatch ? jsonMatch[1] : textResponse;
+                
+                if (isJson) {
+                    let cleaned = textResponse.trim();
+                    if (cleaned.startsWith('```json')) cleaned = cleaned.substring(7);
+                    else if (cleaned.startsWith('```JSON')) cleaned = cleaned.substring(7);
+                    else if (cleaned.startsWith('```')) cleaned = cleaned.substring(3);
+                    if (cleaned.endsWith('```')) cleaned = cleaned.substring(0, cleaned.length - 3);
+                    return cleaned.trim();
+                }
+                return textResponse;
             }
-            throw new Error("A IA não retornou uma resposta válida.");
+            throw new Error("A IA retornou vazio.");
         }
 
         // ===================================================================================
-        // LÓGICA DA APLICAÇÃO (UI, Eventos, etc.)
+        // 7. RENDERIZAÇÃO DA GRADE (MOBILE-FIRST: 2 COLUNAS)
         // ===================================================================================
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value.toLowerCase();
+            renderWineList();
+        });
 
-        function createWineFingerprint(wineInfo) {
-            const name = (wineInfo.wineName || '').trim().toLowerCase();
-            const grape = (wineInfo.grape || 'desconhecida').trim().toLowerCase();
-            const year = wineInfo.year || 0;
-            return `${name}-${grape}-${year}`;
-        }
-
-        function renderWineList(wines) {
+        function renderWineList() {
             wineList.innerHTML = '';
-            emptyMessage.classList.toggle('hidden', wines.length > 0);
+            
+            const filteredWines = currentWines.filter(wine => {
+                const searchStr = `${wine.wineName || ''} ${wine.grape || ''} ${wine.region || ''} ${wine.year || ''}`.toLowerCase();
+                return searchStr.includes(searchTerm);
+            });
 
-            wines.sort((a, b) => (a.wineName || '').localeCompare(b.wineName || '')).forEach(wine => {
-                const wineElement = document.createElement('div');
-                wineElement.className = 'bg-stone-900 bg-opacity-60 p-4 rounded-xl flex justify-between items-center transition-all duration-300 hover:bg-opacity-80 hover:scale-[1.02] cursor-pointer shadow-md border-l-4 border-red-700';
-                wineElement.onclick = () => showStockWineDetails(wine);
-                wineElement.innerHTML = `
-                    <div>
-                        <p class="font-bold text-lg text-white">${wine.wineName || 'Nome Desconhecido'} ${wine.year ? `<span class="text-sm text-gray-400">(${wine.year})</span>` : ''}</p>
-                        <p class="text-sm text-red-300">${wine.grape || 'Uva Desconhecida'} - ${wine.region || 'Região Desconhecida'}</p>
+            emptyMessage.classList.toggle('hidden', filteredWines.length > 0);
+
+            // Atualiza Total de Garrafas vs Rótulos
+            const totalQuantity = currentWines.reduce((sum, wine) => sum + (wine.quantity || 0), 0);
+            totalWineCountDisplay.textContent = totalQuantity;
+            uniqueLabelsCountDisplay.textContent = currentWines.length; // Quantidade de Cards
+
+            filteredWines.sort((a, b) => (a.wineName || '').localeCompare(b.wineName || '')).forEach(wine => {
+                const card = document.createElement('div');
+                card.className = 'glass-card p-3.5 rounded-2xl flex flex-col h-full cursor-pointer relative overflow-hidden group';
+                
+                const statusColor = wine.quantity > 2 ? 'bg-green-500' : (wine.quantity === 1 ? 'bg-red-600' : 'bg-amber-500');
+                
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-full h-1 ${statusColor} opacity-70"></div>
+                    
+                    <div class="flex justify-between items-start mb-2 gap-1 relative z-10">
+                        <h3 class="font-serif font-bold text-sm sm:text-base text-white leading-tight line-clamp-2">${wine.wineName || 'Desconhecido'}</h3>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="bg-red-800 text-white text-sm font-bold w-8 h-8 flex items-center justify-center rounded-full">${wine.quantity}</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                    
+                    <div class="mb-3 relative z-10 space-y-1">
+                        <p class="text-[10px] sm:text-xs text-stone-300 font-medium flex items-center gap-1.5"><span class="text-purple-400 text-xs">🍇</span> <span class="truncate">${wine.grape || 'Sem uva'}</span></p>
+                        <p class="text-[9px] sm:text-[10px] text-stone-500 flex items-center gap-1.5 uppercase tracking-wider font-semibold"><span class="text-blue-500/70 text-xs">📍</span> <span class="truncate">${wine.region || 'S/ Origem'}</span></p>
+                        ${wine.year ? `<p class="text-[10px] text-red-400 font-bold flex items-center gap-1.5 mt-0.5"><span class="text-stone-500 text-xs">🗓️</span> ${wine.year}</p>` : ''}
+                    </div>
+                    
+                    <div class="mt-auto pt-2 border-t border-stone-800/50 flex items-center justify-between relative z-10">
+                        <div class="flex items-center gap-1.5 bg-stone-950/60 px-2 py-1 rounded-lg border border-stone-800">
+                            <span class="text-[9px] text-stone-500 uppercase">Qtd</span>
+                            <span class="font-bold text-sm sm:text-base ${wine.quantity === 0 ? 'text-stone-600' : 'text-white'}">${wine.quantity}</span>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-stone-800 flex items-center justify-center text-stone-400 border border-stone-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </div>
                     </div>
                 `;
-                wineList.appendChild(wineElement);
+                card.onclick = () => showStockWineDetails(wine);
+                wineList.appendChild(card);
             });
         }
 
-        async function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            showLoadingModal('Analisando o rótulo...');
-            try {
-                const base64Image = await toBase64(file);
-                const prompt = `Você é a "Adega Inteligente", uma IA sommelier. Analise a imagem do rótulo de vinho. Extraia as informações e retorne ESTRITAMENTE em formato JSON. O objeto deve ter: "wineName" (string), "grape" (string), "region" (string), "year" (número ou null), "description" (string, max 250 caracteres), "foodPairings" (array de 5 strings). Se não encontrar uma informação, retorne null para o campo correspondente, mas sempre retorne o JSON completo.`;
-                const jsonResponse = await callGenerativeAI(prompt, base64Image);
-                const wineInfo = JSON.parse(jsonResponse);
-                if (wineInfo && wineInfo.wineName) {
-                    showScannedWineModal(wineInfo);
-                } else {
-                    showErrorModal('Não foi possível analisar o rótulo. Tente uma foto com melhor iluminação e foco.');
-                }
-            } catch (error) {
-                console.error("Erro no processo de upload:", error);
-                showErrorModal(`Ocorreu um erro ao contatar a IA. Detalhes: ${error.message}`);
-            } finally {
-                hideLoadingModal();
-                // Limpa o valor dos inputs para permitir a seleção do mesmo arquivo novamente
-                cameraInput.value = '';
-                galleryInput.value = '';
-            }
+        // ===================================================================================
+        // 8. CRUD LOGIC
+        // ===================================================================================
+        function createWineFingerprint(wineInfo) {
+            return `${(wineInfo.wineName || '').trim().toLowerCase()}-${(wineInfo.grape || '').trim().toLowerCase()}-${wineInfo.year || 0}`;
         }
 
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
-        });
-
-        function addWine(wineInfo) {
+        function addWineFromScan(wineInfo) {
             const wines = [...currentWines];
-            const newWineFingerprint = createWineFingerprint(wineInfo);
-            const existingWineIndex = wines.findIndex(w => createWineFingerprint(w) === newWineFingerprint);
+            const newFingerprint = createWineFingerprint(wineInfo);
+            const existingIndex = wines.findIndex(w => createWineFingerprint(w) === newFingerprint);
+
+            if (existingIndex > -1) wines[existingIndex].quantity++;
+            else wines.push({ ...wineInfo, quantity: 1, id: Date.now() + Math.random() });
             
-            if (existingWineIndex > -1) {
-                wines[existingWineIndex].quantity++;
-            } else {
-                wines.push({ ...wineInfo, quantity: 1, id: Date.now() });
-            }
             saveWinesToFirebase(wines);
             closeModal();
         }
 
-        function drinkWine(wineInfo) {
+        function updateWineQuantity(wineId, delta) {
             let wines = [...currentWines];
-            const wineToDrinkFingerprint = createWineFingerprint(wineInfo);
-            const existingWineIndex = wines.findIndex(w => createWineFingerprint(w) === wineToDrinkFingerprint);
-
-            if (existingWineIndex > -1) {
-                wines[existingWineIndex].quantity--;
-                if (wines[existingWineIndex].quantity <= 0) {
-                    wines = wines.filter((_, index) => index !== existingWineIndex);
-                }
+            const index = wines.findIndex(w => w.id === wineId);
+            if (index > -1) {
+                wines[index].quantity += delta;
+                if (wines[index].quantity < 0) wines[index].quantity = 0;
                 saveWinesToFirebase(wines);
+                if(delta !== 0) showStockWineDetails(wines[index]);
             }
-            closeModal();
         }
+
+        function deleteWine(wineId) {
+            if(confirm("Remover este vinho da adega?")) {
+                let wines = currentWines.filter(w => w.id !== wineId);
+                saveWinesToFirebase(wines);
+                closeModal();
+            }
+        }
+
+        function saveEditedWine(wineId) {
+            const wines = [...currentWines];
+            const index = wines.findIndex(w => w.id === wineId);
+            if (index > -1) {
+                wines[index].wineName = document.getElementById('edit-name').value;
+                wines[index].grape = document.getElementById('edit-grape').value;
+                wines[index].region = document.getElementById('edit-region').value;
+                wines[index].year = document.getElementById('edit-year').value;
+                saveWinesToFirebase(wines);
+                showStockWineDetails(wines[index]); 
+            }
+        }
+
+        // ===================================================================================
+        // 9. CONTROLE DE MODAIS (UI)
+        // ===================================================================================
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContainer = document.getElementById('modal-container');
+        const modalContent = document.getElementById('modal-content');
+        const loadingModal = document.getElementById('loading-modal');
+        const loadingText = document.getElementById('loading-text');
 
         function openModal() {
             modalBackdrop.classList.remove('hidden', 'modal-scale-enter-from');
@@ -464,187 +530,326 @@
             setTimeout(() => {
                 modalBackdrop.classList.add('hidden');
                 modalContainer.classList.add('hidden');
-                modalContent.innerHTML = ''; // Limpa o conteúdo para evitar eventos duplicados
-            }, 200);
+                modalContent.innerHTML = '';
+            }, 250); 
         }
-        
+
         function showLoadingModal(text) { loadingText.textContent = text; loadingModal.classList.remove('hidden'); }
         function hideLoadingModal() { loadingModal.classList.add('hidden'); }
 
-        function showImageSourceModal() {
-            const btnClass = "font-bold py-4 px-4 rounded-lg w-full transition-transform transform hover:scale-105 text-lg flex items-center justify-center gap-3";
+        function showErrorModal(message) {
             modalContent.innerHTML = `
-                <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                <h2 class="font-serif text-3xl text-white mb-6 text-center">Adicionar Vinho</h2>
-                <div class="flex flex-col gap-4">
-                    <button id="open-camera-btn" class="bg-red-800 hover:bg-red-700 text-white ${btnClass}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        Tirar Foto com a Câmera
-                    </button>
-                    <button id="open-gallery-btn" class="bg-gray-600 hover:bg-gray-500 text-white ${btnClass}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        Escolher da Galeria
-                    </button>
+                <div class="p-6 text-center">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-900/30 text-red-500 mb-4 border border-red-500/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    </div>
+                    <h2 class="font-serif text-2xl text-white mb-3">Aviso</h2>
+                    <p class="text-stone-400 text-sm leading-relaxed mb-6">${message}</p>
+                    <button class="close-modal-btn w-full bg-stone-800 hover:bg-stone-700 text-white font-bold py-3 rounded-xl transition-colors text-sm">OK</button>
                 </div>
             `;
             openModal();
             modalContent.querySelector('.close-modal-btn').onclick = closeModal;
-            modalContent.querySelector('#open-camera-btn').onclick = () => {
-                cameraInput.click();
-                closeModal();
-            };
-            modalContent.querySelector('#open-gallery-btn').onclick = () => {
-                galleryInput.click();
-                closeModal();
-            };
+        }
+
+        // ===================================================================================
+        // 10. TELAS DO MODAL COM HEADER FIXO (MOBILE FIRST)
+        // ===================================================================================
+        
+        const getModalHeader = (title, icon = '', showBackBtn = false) => `
+            <div class="sticky top-0 bg-stone-950/95 backdrop-blur-md z-20 pb-3 mb-4 border-b border-stone-800 flex justify-between items-center px-6 pt-5 -mx-6 -mt-6 rounded-t-[2rem]">
+                <h2 class="font-serif text-xl sm:text-2xl text-white flex items-center gap-2">${icon} ${title}</h2>
+                <button class="${showBackBtn ? 'back-modal-btn' : 'close-modal-btn'} text-stone-400 hover:text-white bg-stone-900 border border-stone-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors">
+                    ${showBackBtn 
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>' 
+                        : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                </button>
+            </div>
+        `;
+
+        function showImageSourceModal() {
+            modalContent.innerHTML = `
+                ${getModalHeader('Adicionar Vinho', '📸')}
+                <div class="p-2">
+                    <p class="text-stone-400 text-xs text-center mb-6">Fotografe o rótulo frontal para leitura da IA.</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="open-camera-btn" class="bg-gradient-to-br from-red-900 to-red-800 border border-red-500/30 text-white font-bold py-6 px-2 rounded-2xl flex flex-col items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span class="text-[11px] tracking-wide uppercase">Câmera</span>
+                        </button>
+                        <button id="open-gallery-btn" class="bg-stone-800 border border-stone-600/50 text-white font-bold py-6 px-2 rounded-2xl flex flex-col items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            <span class="text-[11px] tracking-wide uppercase">Galeria</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            openModal();
+            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+            modalContent.querySelector('#open-camera-btn').onclick = () => { document.getElementById('camera-input').click(); closeModal(); };
+            modalContent.querySelector('#open-gallery-btn').onclick = () => { document.getElementById('gallery-input').click(); closeModal(); };
+        }
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            showLoadingModal('Analisando rótulo com IA...');
+            try {
+                const base64Image = await toBase64(file);
+                const prompt = `Extraia dados visíveis no rótulo. Retorne JSON: "wineName", "grape" (só verdade), "region", "year" (numero ou null), "description" (max 150 carac, factual), "foodPairings" (array de 3 strings, clássicas). Null se invisível.`;
+                const jsonResponse = await callGenerativeAI(prompt, base64Image, true);
+                const wineInfo = JSON.parse(jsonResponse);
+                
+                if (wineInfo && wineInfo.wineName) showScannedWineModal(wineInfo);
+                else showErrorModal('Não foi possível ler os dados técnicos deste rótulo.');
+            } catch (error) {
+                showErrorModal(`Análise falhou. Detalhes: ${error.message}`);
+            } finally {
+                hideLoadingModal();
+                event.target.value = ''; 
+            }
         }
 
         function showScannedWineModal(wineInfo) {
-            const newWineFingerprint = createWineFingerprint(wineInfo);
-            const existingWine = currentWines.find(w => createWineFingerprint(w) === newWineFingerprint);
-            const isInStock = !!existingWine;
-            const btnClass = "font-bold py-3 px-4 rounded-lg w-full transition-transform transform hover:scale-105";
-            
+            const fingerprint = createWineFingerprint(wineInfo);
+            const isInStock = !!currentWines.find(w => createWineFingerprint(w) === fingerprint);
+
             modalContent.innerHTML = `
-                <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                <h2 class="font-serif text-3xl text-white mb-2">${wineInfo.wineName || 'Nome Desconhecido'} ${wineInfo.year ? `(${wineInfo.year})` : ''}</h2>
-                <p class="text-red-300 mb-4">${wineInfo.grape || 'Uva Desconhecida'} - ${wineInfo.region || 'Região Desconhecida'}</p>
-                <div class="space-y-4">
-                    <div class="bg-stone-900 bg-opacity-50 p-4 rounded-lg"><h3 class="font-bold text-lg mb-2 text-white">Sobre este vinho</h3><p class="text-gray-300">${wineInfo.description || 'Descrição não disponível.'}</p></div>
-                    <div class="bg-stone-900 bg-opacity-50 p-4 rounded-lg"><h3 class="font-bold text-lg mb-2 text-white">Harmonização Sugerida</h3><ul class="list-disc list-inside text-gray-300 space-y-1">${(wineInfo.foodPairings || []).map(p => `<li>${p}</li>`).join('')}</ul></div>
+                ${getModalHeader('Confirmação', '✔️')}
+                <div class="px-2">
+                    <div class="mb-5 pb-4 border-b border-stone-800">
+                        <h2 class="font-serif text-2xl text-white mb-2">${wineInfo.wineName || 'Sem Nome'} ${wineInfo.year ? `<span class="text-base text-stone-500">(${wineInfo.year})</span>` : ''}</h2>
+                        <p class="text-stone-400 text-xs font-semibold tracking-widest uppercase">${wineInfo.grape || 'S/ Uva'} &bull; ${wineInfo.region || 'S/ Região'}</p>
+                    </div>
+                    <div class="space-y-3 mb-6 max-h-[35vh] overflow-y-auto custom-scrollbar pr-2">
+                        <div class="bg-stone-900/50 p-3 rounded-xl border border-stone-800">
+                            <h3 class="text-[10px] text-stone-500 uppercase tracking-widest mb-1">Análise Técnica</h3>
+                            <p class="text-stone-300 text-xs leading-relaxed">${wineInfo.description || 'Não identificada.'}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="add-wine-btn bg-red-800 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-wide">
+                            ${isInStock ? '+1 Adicionar ao Estoque Existente' : '💾 Salvar na Adega'}
+                        </button>
+                        <button class="close-modal-btn bg-transparent border border-stone-700 text-stone-400 py-3.5 rounded-xl text-sm uppercase font-bold">Descartar</button>
+                    </div>
                 </div>
-                <div class="mt-6 flex flex-col gap-3">
-                    <button class="add-wine-btn bg-red-800 hover:bg-red-700 text-white ${btnClass}">
-                        ${isInStock ? 'Adicionar +1 Garrafa' : 'Adicionar ao Estoque'}
-                    </button>
-                    ${isInStock ? `<button class="drink-wine-btn bg-green-700 hover:bg-green-600 text-white ${btnClass}">Beber 1 Garrafa</button>` : ''}
-                </div>`;
-            
+            `;
             openModal();
-            
-            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
-            modalContent.querySelector('.add-wine-btn').onclick = () => addWine(wineInfo);
-            if (isInStock) {
-                modalContent.querySelector('.drink-wine-btn').onclick = () => drinkWine(wineInfo);
-            }
+            modalContent.querySelectorAll('.close-modal-btn').forEach(b => b.onclick = closeModal);
+            modalContent.querySelector('.add-wine-btn').onclick = () => addWineFromScan(wineInfo);
         }
 
-        function showStockWineDetails(wineInfo) {
-            const btnClass = "font-bold py-3 px-4 rounded-lg w-full transition-transform transform hover:scale-105";
+        function showStockWineDetails(wine) {
             modalContent.innerHTML = `
-                <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                <h2 class="font-serif text-3xl text-white mb-2">${wineInfo.wineName} ${wineInfo.year ? `(${wineInfo.year})` : ''}</h2>
-                <p class="text-red-300 mb-4">${wineInfo.grape} - ${wineInfo.region}</p>
-                <p class="text-gray-300 mb-6 text-center bg-stone-900 bg-opacity-50 p-3 rounded-lg">Você tem <strong>${wineInfo.quantity}</strong> garrafa(s) em estoque.</p>
-                <div class="flex flex-col gap-3">
-                    <button class="tech-sheet-btn bg-gray-600 hover:bg-gray-500 text-white ${btnClass}">✨ Gerar Ficha Técnica</button>
-                    <button class="add-wine-btn bg-blue-600 hover:bg-blue-700 text-white ${btnClass}">Adicionar +1 Garrafa</button>
-                    <button class="drink-wine-btn bg-green-700 hover:bg-green-600 text-white ${btnClass}">Beber 1 Garrafa</button>
-                </div>`;
+                ${getModalHeader('Detalhes', '🍷')}
+                <div class="px-2 pb-4">
+                    <div class="mb-6 border-b border-stone-800 pb-5">
+                        <h2 class="font-serif text-3xl text-white mb-2 leading-tight">${wine.wineName}</h2>
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <span class="bg-red-900/30 text-red-400 text-xs px-2.5 py-0.5 rounded font-bold">${wine.year || 'S.A.'}</span>
+                            <span class="text-stone-400 text-[10px] uppercase tracking-widest">${wine.grape}</span>
+                        </div>
+                        <p class="text-stone-500 text-xs">📍 ${wine.region}</p>
+                    </div>
+
+                    <div class="bg-stone-900 border border-stone-800 rounded-2xl p-4 flex items-center justify-between mb-6">
+                        <span class="text-stone-400 text-xs uppercase tracking-widest font-medium">Garrafas</span>
+                        <div class="flex items-center gap-4">
+                            <button class="btn-minus w-10 h-10 rounded-full bg-stone-950 text-stone-400 border border-stone-700 text-xl flex items-center justify-center">-</button>
+                            <span class="text-3xl font-serif text-white font-bold w-8 text-center">${wine.quantity}</span>
+                            <button class="btn-plus w-10 h-10 rounded-full bg-stone-950 text-stone-400 border border-stone-700 text-xl flex items-center justify-center">+</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button class="tech-sheet-btn bg-stone-800 border border-stone-700 text-stone-200 py-3 rounded-xl text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-1.5">
+                            📜 Ficha Técnica
+                        </button>
+                        <button class="edit-wine-btn bg-stone-800 border border-stone-700 text-stone-200 py-3 rounded-xl text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-1.5">
+                            ✏️ Editar Info
+                        </button>
+                        <button class="delete-wine-btn col-span-2 mt-2 bg-transparent border border-red-900/50 text-red-500 py-3 rounded-xl text-[10px] uppercase tracking-widest font-bold">
+                            🗑️ Remover da Adega
+                        </button>
+                    </div>
+                </div>
+            `;
 
             openModal();
-            
             modalContent.querySelector('.close-modal-btn').onclick = closeModal;
-            modalContent.querySelector('.tech-sheet-btn').onclick = () => generateTechSheet(wineInfo);
-            modalContent.querySelector('.add-wine-btn').onclick = () => addWine(wineInfo);
-            modalContent.querySelector('.drink-wine-btn').onclick = () => drinkWine(wineInfo);
+            modalContent.querySelector('.delete-wine-btn').onclick = () => deleteWine(wine.id);
+            modalContent.querySelector('.edit-wine-btn').onclick = () => showEditWineModal(wine);
+            modalContent.querySelector('.btn-minus').onclick = () => updateWineQuantity(wine.id, -1);
+            modalContent.querySelector('.btn-plus').onclick = () => updateWineQuantity(wine.id, 1);
+            modalContent.querySelector('.tech-sheet-btn').onclick = () => generateTechSheet(wine);
         }
 
-        function showErrorModal(message) {
+        function showEditWineModal(wine) {
             modalContent.innerHTML = `
-                <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                <h2 class="font-serif text-3xl text-red-400 mb-2">Ocorreu um Erro</h2>
-                <p class="text-gray-300">${message}</p>`;
-            openModal();
-            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+                ${getModalHeader('Editar', '✏️', true)}
+                <div class="px-2 pb-4 space-y-4">
+                    <div>
+                        <label class="block text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 pl-1">Rótulo</label>
+                        <input type="text" id="edit-name" value="${wine.wineName || ''}" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-red-600 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 pl-1">Uvas</label>
+                        <input type="text" id="edit-grape" value="${wine.grape || ''}" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-red-600 outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 pl-1">Região</label>
+                            <input type="text" id="edit-region" value="${wine.region || ''}" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-red-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-bold text-stone-500 uppercase tracking-widest mb-1 pl-1">Ano</label>
+                            <input type="number" id="edit-year" value="${wine.year || ''}" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-red-600 outline-none">
+                        </div>
+                    </div>
+                    <button class="save-edit-btn w-full mt-4 bg-green-700 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest">Salvar Alterações</button>
+                </div>
+            `;
+            modalContent.querySelector('.back-modal-btn').onclick = () => showStockWineDetails(wine);
+            modalContent.querySelector('.save-edit-btn').onclick = () => saveEditedWine(wine.id);
         }
 
-        async function generateTechSheet(wineInfo) {
-            showLoadingModal('Gerando ficha técnica...');
+        async function generateTechSheet(wine) {
+            showLoadingModal('Analisando ficha...');
             try {
-                const prompt = `Gere uma "ficha técnica" detalhada para o vinho "${wineInfo.wineName} ${wineInfo.year || ''}" da região "${wineInfo.region}" com uva "${wineInfo.grape}". Formate com emojis. Inclua: 🌡️ Temperatura Ideal, ⏳ Potencial de Guarda, 📝 Nota de Prova (visual, olfativo, gustativo), 🧐 Curiosidade, 🌟 Nota Estimada (0-100).`;
-                const techSheetText = await callGenerativeAI(prompt);
+                const prompt = `Ficha Técnica 100% VERDADEIRA para: ${wine.wineName}, Ano: ${wine.year}, Região: ${wine.region}, Uva: ${wine.grape}. Se não houver info oficial do rótulo, dê infos da uva/região genérica verídica. HTML: <h3>, <p>, <ul>. Sem invenções.`;
+                const htmlText = await callGenerativeAI(prompt);
+                
                 modalContent.innerHTML = `
-                    <button class="close-modal-btn absolute top-4 right-4 text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                    <h2 class="font-serif text-3xl text-white mb-4">✨ Ficha Técnica</h2>
-                    <div class="text-gray-300 space-y-3 whitespace-pre-wrap">${techSheetText.replace(/\n/g, '<br>')}</div>`;
-                modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+                    ${getModalHeader('Ficha Técnica', '📜', true)}
+                    <div class="px-3 pb-6 text-stone-300 space-y-4 max-h-[65vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-lg [&>h3]:mt-4 [&>h3]:border-b [&>h3]:border-stone-800 [&>h3]:pb-1 [&>ul]:list-disc [&>ul]:pl-4 [&>p]:text-xs [&>p]:leading-relaxed [&>li]:text-xs">
+                        ${htmlText}
+                    </div>`;
+                modalContent.querySelector('.back-modal-btn').onclick = () => showStockWineDetails(wine);
             } catch (error) {
-                console.error("Erro ao gerar ficha:", error);
-                showErrorModal(`Ocorreu um erro ao contatar a IA: ${error.message}`);
-            } finally {
-                hideLoadingModal();
-            }
+                showErrorModal(`Erro: ${error.message}`);
+            } finally { hideLoadingModal(); }
         }
 
         function openChatModal() {
-            const chatHistory = [{ role: 'ai', text: 'Olá! Sou seu sommelier virtual. Como posso ajudar hoje? Pergunte sobre harmonizações, uvas ou peça uma recomendação!' }];
+            const chatHistory = [{ role: 'ai', text: 'Sommelier online. Fatos e verdades enológicas. Como harmonizamos hoje?' }];
             modalContent.innerHTML = `
-                <div class="flex justify-between items-center pb-3 border-b border-gray-700">
-                    <h2 class="font-serif text-2xl text-white">✨ Converse com o Sommelier</h2>
-                    <button class="close-modal-btn text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
-                </div>
-                <div id="chat-messages" class="flex-1 py-4 space-y-4 overflow-y-auto flex flex-col h-80 my-4">
-                    ${chatHistory.map(msg => `<div class="chat-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}">${msg.text}</div>`).join('')}
-                </div>
-                <div class="pt-3 border-t border-gray-700">
-                    <form id="chat-form" class="flex gap-2">
-                        <input type="text" id="chat-input" class="flex-1 bg-stone-800 border border-gray-600 rounded-full px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Pergunte sobre vinhos...">
-                        <button type="submit" class="bg-red-800 hover:bg-red-700 text-white font-bold p-3 rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg></button>
+                ${getModalHeader('Sommelier', '🤵')}
+                <div class="px-2 pb-2 flex flex-col h-[65vh]">
+                    <div id="chat-messages" class="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar pb-4">
+                        ${chatHistory.map(msg => `
+                            <div class="max-w-[90%] p-3 rounded-2xl text-xs leading-relaxed ${msg.role === 'user' ? 'bg-red-900/60 text-white rounded-br-sm self-end' : 'bg-stone-900 text-stone-300 border border-stone-800 rounded-bl-sm self-start'}">
+                                ${msg.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <form id="chat-form" class="relative flex items-center mt-2 border-t border-stone-800 pt-3">
+                        <input type="text" id="chat-input" class="w-full bg-stone-900 border border-stone-700 rounded-xl pl-4 pr-12 py-3 text-white text-sm focus:outline-none focus:border-red-700" placeholder="Pergunte..." autocomplete="off">
+                        <button type="submit" class="absolute right-2 w-9 h-9 bg-red-800 text-white rounded-lg flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                        </button>
                     </form>
                 </div>`;
             openModal();
-            
             modalContent.querySelector('.close-modal-btn').onclick = closeModal;
-            
+
             const chatForm = document.getElementById('chat-form');
             chatForm.onsubmit = async (e) => {
                 e.preventDefault();
                 const chatInput = document.getElementById('chat-input');
-                const userMessage = chatInput.value.trim();
-                if (!userMessage) return;
-                addChatMessage(userMessage, 'user');
+                const userMsg = chatInput.value.trim();
+                if (!userMsg) return;
+                
+                addChatBubble(userMsg, 'user');
                 chatInput.value = '';
+                const loaderId = addChatBubble('<div class="flex gap-1 items-center h-4"><div class="w-1.5 h-1.5 bg-stone-500 rounded-full animate-bounce"></div><div class="w-1.5 h-1.5 bg-stone-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div></div>', 'ai', true);
+
                 try {
-                    const stock = currentWines.map(w => `- ${w.quantity}x ${w.wineName || 'Vinho Desconhecido'} (${w.grape || 'Uva Desconhecida'}, ${w.year || 'S.A.'})`).join('\n');
-                    const prompt = `Você é um Master Sommelier da "Adega Inteligente". Sua principal função é a harmonização precisa.
-
-**DIRETIVA DE TRÊS ESTÁGIOS:**
-
-1.  **ANÁLISE DE ESTOQUE (PRIORIDADE MÁXIMA):** Primeiro, analise o prato do usuário ("${userMessage}") e compare-o com os vinhos que ele possui em estoque:\n${stock || 'Nenhum'}\nSe houver uma harmonização boa ou excelente, sua resposta DEVE começar com "Da sua adega, a melhor opção é..." e recomende o vinho, explicando o porquê da harmonização.
-
-2.  **RECOMENDAÇÃO DE COMPRA (PLANO B):** Se, e somente se, nenhum vinho do estoque for uma boa opção, sua resposta DEVE começar com "Para este prato, a harmonização ideal seria..." e sugira o tipo de vinho a ser comprado (uva, região, características).
-
-3.  **PROATIVIDADE CULINÁRIA (ENGAJAMENTO):** Se o usuário pedir uma receita, forneça uma. Caso contrário, sempre que apropriado, finalize suas respostas com uma pergunta aberta para engajar o usuário, como "Gostaria de uma sugestão de receita para acompanhar este prato?".
-
-**REQUISIÇÃO DO USUÁRIO:** "${userMessage}"`;
+                    const stock = currentWines.filter(w=>w.quantity>0).map(w => `- ${w.wineName} (${w.grape})`).join('\n');
+                    const prompt = `Usuário: "${userMsg}". Adega:\n${stock || 'Vazia'}\n100% VERDADE TÉCNICA ENOLÓGICA. Harmonize com exatidão clássica priorizando o estoque. Seja direto. Sem markdown.`;
                     const aiResponse = await callGenerativeAI(prompt);
-                    addChatMessage(aiResponse, 'ai');
+                    document.getElementById(loaderId).innerHTML = aiResponse.replace(/\n/g, '<br>');
                 } catch (error) {
-                    addChatMessage(`Desculpe, estou com problemas para me conectar. ${error.message}`, 'ai');
+                    document.getElementById(loaderId).innerHTML = `Erro: ${error.message}`;
                 }
             };
         }
 
-        function addChatMessage(text, role) {
+        function addChatBubble(text, role, isHtml = false) {
             const chatMessages = document.getElementById('chat-messages');
-            const messageEl = document.createElement('div');
-            const bubbleClass = role === 'user' ? 'bg-red-800 self-end' : 'bg-stone-700 self-start';
-            messageEl.className = `chat-bubble rounded-xl max-w-[85%] p-3 text-white ${bubbleClass}`;
-            messageEl.textContent = text;
-            chatMessages.appendChild(messageEl);
+            const el = document.createElement('div');
+            const id = 'msg-' + Date.now();
+            el.id = id;
+            el.className = `max-w-[90%] p-3 rounded-2xl text-xs leading-relaxed mt-4 ${role === 'user' ? 'bg-red-900/60 text-white rounded-br-sm self-end' : 'bg-stone-900 text-stone-300 border border-stone-800 rounded-bl-sm self-start'}`;
+            if(isHtml) el.innerHTML = text; else el.textContent = text;
+            chatMessages.appendChild(el);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
         }
 
-        // --- EVENT LISTENERS ---
-        apiMonitor.addEventListener('click', () => {
-            apiMonitor.classList.toggle('is-expanded');
-        });
-        addWineActionBtn.addEventListener('click', showImageSourceModal);
-        cameraInput.addEventListener('change', handleImageUpload);
-        galleryInput.addEventListener('change', handleImageUpload);
-        askSommelierBtn.addEventListener('click', openChatModal);
+        async function suggestWineForTonight() {
+            if (currentWines.length === 0) return showErrorModal("Cadastre vinhos primeiro.");
+            showLoadingModal('Buscando a verdade na adega...');
+            try {
+                const stock = currentWines.filter(w=>w.quantity>0).map(w => `- ${w.wineName}`).join('\n');
+                const prompt = `Sommelier Factual. Adega:\n${stock}\nEscolha 1 vinho para hoje com base técnica verdadeira. HTML limpo (<h3>, <p>).`;
+                const resp = await callGenerativeAI(prompt);
+                
+                modalContent.innerHTML = `
+                    ${getModalHeader('Sugestão Factual', '✨')}
+                    <div class="px-4 pb-6 text-stone-300 space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-lg [&>p]:text-sm">
+                        ${resp}
+                    </div>`;
+                openModal();
+                modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+            } catch (error) { showErrorModal(error.message); } finally { hideLoadingModal(); }
+        }
+
+        function openDinnerPlannerModal() {
+            if (currentWines.length === 0) return showErrorModal("Sem vinhos para harmonizar.");
+            modalContent.innerHTML = `
+                ${getModalHeader('Harmonizar Jantar', '🍽️')}
+                <div class="px-4 pb-6">
+                    <p class="text-stone-400 text-xs mb-6">Informe a temática do prato para uma harmonização verdadeira.</p>
+                    <form id="dinner-form" class="flex flex-col gap-4">
+                        <input type="text" id="dinner-theme" class="bg-stone-900 border border-stone-700 rounded-xl p-4 text-white text-sm outline-none focus:border-blue-500" placeholder="Ex: Frutos do Mar..." required>
+                        <button type="submit" class="bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-xs">Elaborar Menu</button>
+                    </form>
+                </div>`;
+            openModal();
+            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+            document.getElementById('dinner-form').onsubmit = (e) => { e.preventDefault(); generateDinnerMenu(document.getElementById('dinner-theme').value); };
+        }
+
+        async function generateDinnerMenu(theme) {
+            showLoadingModal('Aplicando regras da enologia...');
+            try {
+                const stock = currentWines.filter(w=>w.quantity>0).map(w => `- ${w.wineName} (${w.grape}, ${w.region})`).join('\n');
+                const prompt = `Tema: "${theme}". Estoque:\n${stock}\nCrie cardápio (Entrada, Principal, Sobremesa). Harmonize EXCLUSIVAMENTE com a adega e diga A VERDADE TÉCNICA. HTML (<h3>, <p>, <ul>, <li>).`;
+                const resp = await callGenerativeAI(prompt);
+                
+                modalContent.innerHTML = `
+                    ${getModalHeader('Menu Harmonizado', '🍽️')}
+                    <div class="px-4 pb-4 text-stone-300 space-y-3 max-h-[55vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-base [&>h3]:mt-4 [&>ul]:list-disc [&>ul]:pl-5 [&>li]:text-xs [&>p]:text-xs">
+                        <h3 class="text-blue-400 border-b border-stone-800 pb-2 mb-4">${theme}</h3>
+                        ${resp}
+                    </div>`;
+                openModal();
+                modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+            } catch (error) { showErrorModal(error.message); } finally { hideLoadingModal(); }
+        }
+
+        // ===================================================================================
+        // 12. INICIALIZAÇÃO DE LISTENERS
+        // ===================================================================================
+        document.getElementById('api-monitor').addEventListener('click', function() { this.classList.toggle('is-expanded'); });
+        document.getElementById('add-wine-action-btn').addEventListener('click', showImageSourceModal);
+        document.getElementById('camera-input').addEventListener('change', handleImageUpload);
+        document.getElementById('gallery-input').addEventListener('change', handleImageUpload);
+        document.getElementById('ask-sommelier-btn').addEventListener('click', openChatModal);
+        document.getElementById('btn-surprise-me').addEventListener('click', suggestWineForTonight);
+        document.getElementById('btn-dinner-planner').addEventListener('click', openDinnerPlannerModal);
 
     </script>
 </body>
-</ht
+</html>
