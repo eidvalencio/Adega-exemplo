@@ -506,13 +506,20 @@
         }
 
         // ===================================================================================
-        // 9. CONTROLE DE MODAIS (UI)
+        // 9. CONTROLE DE MODAIS E FUNÇÕES UTILITÁRIAS
         // ===================================================================================
         const modalBackdrop = document.getElementById('modal-backdrop');
         const modalContainer = document.getElementById('modal-container');
         const modalContent = document.getElementById('modal-content');
         const loadingModal = document.getElementById('loading-modal');
         const loadingText = document.getElementById('loading-text');
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
 
         function openModal() {
             modalBackdrop.classList.remove('hidden', 'modal-scale-enter-from');
@@ -552,10 +559,6 @@
             modalContent.querySelector('.close-modal-btn').onclick = closeModal;
         }
 
-        // ===================================================================================
-        // 10. TELAS DO MODAL COM HEADER FIXO (MOBILE FIRST) E PROCESSAMENTO DE IMAGEM
-        // ===================================================================================
-        
         const getModalHeader = (title, icon = '', showBackBtn = false) => `
             <div class="sticky top-0 bg-stone-950/95 backdrop-blur-md z-20 pb-3 mb-4 border-b border-stone-800 flex justify-between items-center px-6 pt-5 -mx-6 -mt-6 rounded-t-[2rem]">
                 <h2 class="font-serif text-xl sm:text-2xl text-white flex items-center gap-2">${icon} ${title}</h2>
@@ -567,6 +570,9 @@
             </div>
         `;
 
+        // ===================================================================================
+        // 10. MODAIS DE ADIÇÃO E SCANEAMENTO DE RÓTULO
+        // ===================================================================================
         function showImageSourceModal() {
             modalContent.innerHTML = `
                 ${getModalHeader('Adicionar Vinho', '📸')}
@@ -589,13 +595,6 @@
             modalContent.querySelector('#open-camera-btn').onclick = () => { document.getElementById('camera-input').click(); closeModal(); };
             modalContent.querySelector('#open-gallery-btn').onclick = () => { document.getElementById('gallery-input').click(); closeModal(); };
         }
-
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = error => reject(error);
-        });
 
         async function handleImageUpload(event) {
             const file = event.target.files[0];
@@ -648,7 +647,7 @@
         }
 
         // ===================================================================================
-        // 11. Ficha do Vinho + Harmonização Específica (COM CAMPOS SELECIONÁVEIS VERDADEIROS)
+        // 11. FICHA DO VINHO + HARMONIZAÇÃO ESPECÍFICA DE 1 VINHO COM FORMULÁRIO (SELECTS)
         // ===================================================================================
         function showStockWineDetails(wine) {
             modalContent.innerHTML = `
@@ -703,85 +702,86 @@
             modalContent.querySelector('.pair-wine-btn').onclick = () => showWinePairingModal(wine);
         }
 
-        // TELA DE OPÇÕES DE HARMONIZAÇÃO DO VINHO ESPECÍFICO (FORMULÁRIO REAL)
+        // TELA DE OPÇÕES DE HARMONIZAÇÃO DO VINHO ESPECÍFICO (ATUALIZADO COM SELECTS)
         function showWinePairingModal(wine) {
             modalContent.innerHTML = `
                 ${getModalHeader('Ocasião & Prato', '🍷', true)}
-                <div class="px-4 pb-6">
-                    <div class="mb-5 text-center">
+                <div class="px-4 pb-6 space-y-5">
+                    <div class="mb-2 text-center border-b border-stone-800 pb-4">
                         <h3 class="font-serif text-lg text-white line-clamp-1">${wine.wineName}</h3>
                         <p class="text-[10px] text-stone-400 uppercase tracking-widest mt-1">${wine.grape || 'Uva não informada'} • ${wine.year || 'S.A.'}</p>
+                        <p class="text-stone-500 text-[10px] mt-2">Defina os parâmetros estruturados abaixo para a IA analisar a melhor harmonização técnica.</p>
                     </div>
-                    <p class="text-stone-300 text-xs mb-6 text-center">Selecione a ocasião ou prato no formulário abaixo para que a Inteligência Artificial estruture a harmonização ideal baseada em parâmetros químicos e enológicos reais.</p>
                     
+                    <!-- Form de Seleção Verdadeira -->
                     <div class="space-y-4">
-                        <div class="relative">
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 pl-1">Tipo de Refeição / Ocasião</label>
-                            <select id="specific-occasion-select" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-4 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-md">
-                                <option value="" disabled selected>Escolha uma opção na lista...</option>
-                                <option value="Almoço (Leve / Carnes Brancas)">☀️ Almoço (Leve / Carnes Brancas)</option>
-                                <option value="Almoço (Pesado / Carnes Vermelhas)">🥩 Almoço (Pesado / Carnes Vermelhas)</option>
-                                <option value="Jantar Romântico">🕯️ Jantar Romântico</option>
-                                <option value="Jantar de Negócios">🤝 Jantar de Negócios / Formal</option>
-                                <option value="Salgados e Petiscos">🥨 Salgados e Petiscos (Happy Hour)</option>
-                                <option value="Doces e Sobremesas">🍮 Doces e Sobremesas</option>
-                                <option value="Outro">✨ Outra opção (Especificar...)</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 top-[26px] flex items-center px-4 text-stone-400">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">1. Tipo de Refeição</label>
+                            <div class="relative">
+                                <select id="pairing-occasion" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 pr-10 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-inner">
+                                    <option value="Almoço">☀️ Almoço</option>
+                                    <option value="Jantar">🌙 Jantar</option>
+                                    <option value="Happy Hour / Petiscos">🥨 Happy Hour / Petiscos</option>
+                                    <option value="Degustação / Sobremesa">🍮 Degustação / Sobremesa</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div id="specific-custom-container" class="hidden transition-all duration-300">
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 pl-1">Especifique o Prato ou Ocasião</label>
-                            <input type="text" id="specific-custom-input" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-4 text-white text-sm focus:border-blue-600 outline-none placeholder-stone-600 shadow-inner" placeholder="Ex: Risoto de Funghi, Sushi, Queijos Fortes...">
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">2. Categoria do Prato Principal</label>
+                            <div class="relative">
+                                <select id="pairing-category" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 pr-10 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-inner">
+                                    <option value="Carnes Vermelhas">🥩 Carnes Vermelhas</option>
+                                    <option value="Aves e Carnes Brancas">🍗 Aves e Carnes Brancas</option>
+                                    <option value="Pescados e Frutos do Mar">🦐 Pescados e Frutos do Mar</option>
+                                    <option value="Massas e Risotos">🍝 Massas e Risotos</option>
+                                    <option value="Queijos e Embutidos">🧀 Queijos e Embutidos</option>
+                                    <option value="Vegetariano / Vegano">🥗 Vegetariano / Vegano</option>
+                                    <option value="Doces e Chocolates">🍫 Doces e Chocolates</option>
+                                    <option value="Variados / Não definido">🍽️ Variados / Não definido</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <button id="specific-submit-btn" class="w-full bg-blue-800 hover:bg-blue-700 transition-colors text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-xs mt-2">Analisar Harmonização</button>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">3. Detalhes / Ingredientes (Opcional)</label>
+                            <input type="text" id="pairing-details" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-blue-600 outline-none placeholder-stone-600 shadow-inner" placeholder="Ex: Molho branco, Picanha na brasa, Funghi...">
+                        </div>
                     </div>
+                    
+                    <button id="analyze-pairing-btn" class="w-full mt-4 bg-blue-800 hover:bg-blue-700 transition-colors text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-xs flex items-center justify-center gap-2 active:scale-95">
+                        <span>🧠</span> Analisar Harmonização
+                    </button>
                 </div>
             `;
             
             modalContent.querySelector('.back-modal-btn').onclick = () => showStockWineDetails(wine);
             
-            const occasionSelect = modalContent.querySelector('#specific-occasion-select');
-            const customContainer = modalContent.querySelector('#specific-custom-container');
-            const customInput = modalContent.querySelector('#specific-custom-input');
-            const submitBtn = modalContent.querySelector('#specific-submit-btn');
-            
-            occasionSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'Outro') {
-                    customContainer.classList.remove('hidden');
-                    customInput.focus();
-                } else {
-                    customContainer.classList.add('hidden');
-                }
-            });
-            
-            submitBtn.addEventListener('click', () => {
-                let selectedValue = occasionSelect.value;
-                if (!selectedValue) {
-                    alert("Por favor, selecione uma opção de harmonização no campo selecionável.");
-                    return;
-                }
-                if (selectedValue === 'Outro') {
-                    selectedValue = customInput.value.trim();
-                    if (!selectedValue) {
-                        alert("Por favor, especifique o prato ou ocasião no campo de texto.");
-                        return;
-                    }
-                }
-                processSpecificPairing(wine, selectedValue);
-            });
+            modalContent.querySelector('#analyze-pairing-btn').onclick = () => {
+                const occasion = document.getElementById('pairing-occasion').value;
+                const category = document.getElementById('pairing-category').value;
+                const details = document.getElementById('pairing-details').value.trim();
+                
+                // Engenharia de Prompt Estruturada
+                let finalTheme = `Ocasião: ${occasion} | Categoria Principal: ${category}`;
+                if (details) finalTheme += ` | Prato ou Detalhe Específico: ${details}`;
+                
+                processSpecificPairing(wine, finalTheme);
+            };
         }
 
-        // MOTOR DE IA PARA HARMONIZAÇÃO DO VINHO ESPECÍFICO
-        async function processSpecificPairing(wine, occasion) {
+        async function processSpecificPairing(wine, promptTheme) {
             showLoadingModal('O Sommelier está analisando a química do vinho...');
             try {
                 const prompt = `Atue estritamente como um Master Sommelier (100% factual e técnico).
-                Crie uma sugestão de harmonização detalhada e real para o vinho "${wine.wineName}" (Uva: ${wine.grape}, Região: ${wine.region}, Ano: ${wine.year || 'S.A.'}) focada no seguinte prato ou ocasião: "${occasion}".
-                Explique tecnicamente e de forma direta por que os sabores e taninos deste vinho combinam (ou contrastam perfeitamente) com esta opção.
+                Crie uma sugestão de harmonização detalhada e real para o vinho "${wine.wineName}" (Uva: ${wine.grape}, Região: ${wine.region}, Ano: ${wine.year || 'S.A.'}) baseada rigorosamente nestes dados estruturados: "${promptTheme}".
+                Explique tecnicamente e de forma direta por que os sabores, acidez e taninos deste vinho combinam (ou contrastam perfeitamente) com os elementos escolhidos.
                 Use HTML limpo (<h3>, <p>, <ul>, <li>). Sem saudações ou invenções. Vá direto ao conteúdo.`;
                 
                 const resp = await callGenerativeAI(prompt);
@@ -790,9 +790,9 @@
                     ${getModalHeader('Par Perfeito', '✨', true)}
                     <div class="px-4 pb-6 text-stone-300 space-y-4 max-h-[65vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-lg [&>h3]:border-b [&>h3]:border-stone-800 [&>h3]:pb-2 [&>ul]:list-disc [&>ul]:pl-5 [&>li]:text-xs [&>p]:text-xs [&>p]:leading-relaxed">
                         <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/20 border border-blue-800/30 p-4 rounded-2xl mb-5 text-center shadow-inner">
-                            <span class="text-[9px] text-blue-400 uppercase tracking-widest font-bold block mb-1">Harmonização Analisada</span>
-                            <span class="text-sm text-white font-serif leading-tight block">${occasion}</span>
-                            <span class="text-[10px] text-stone-400 mt-1 block">+ ${wine.wineName}</span>
+                            <span class="text-[9px] text-blue-400 uppercase tracking-widest font-bold block mb-1">Análise Estruturada</span>
+                            <span class="text-xs text-white leading-tight block">${promptTheme}</span>
+                            <span class="text-[10px] text-stone-400 mt-2 block">+ ${wine.wineName}</span>
                         </div>
                         ${resp}
                     </div>`;
@@ -850,6 +850,110 @@
             } finally { hideLoadingModal(); }
         }
 
+        // ===================================================================================
+        // 12. HARMONIZAÇÃO GLOBAL (ANALISA A ADEGA INTEIRA COM SELECTS)
+        // ===================================================================================
+        function openDinnerPlannerModal() {
+            if (currentWines.length === 0) return showErrorModal("Sem vinhos na adega para harmonizar.");
+            
+            modalContent.innerHTML = `
+                ${getModalHeader('Harmonizar Adega', '🍽️')}
+                <div class="px-4 pb-6 space-y-5">
+                    <p class="text-stone-400 text-xs mb-2 text-center border-b border-stone-800 pb-4">Preencha os campos estruturados abaixo. O Sommelier analisará todo o seu estoque para montar o menu perfeito.</p>
+                    
+                    <!-- Form de Seleção Verdadeira -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">1. Tipo de Refeição</label>
+                            <div class="relative">
+                                <select id="global-pairing-occasion" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 pr-10 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-inner">
+                                    <option value="Almoço">☀️ Almoço</option>
+                                    <option value="Jantar">🌙 Jantar</option>
+                                    <option value="Happy Hour / Petiscos">🥨 Happy Hour / Petiscos</option>
+                                    <option value="Degustação / Sobremesa">🍮 Degustação / Sobremesa</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">2. Categoria do Prato Principal</label>
+                            <div class="relative">
+                                <select id="global-pairing-category" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 pr-10 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-inner">
+                                    <option value="Carnes Vermelhas">🥩 Carnes Vermelhas</option>
+                                    <option value="Aves e Carnes Brancas">🍗 Aves e Carnes Brancas</option>
+                                    <option value="Pescados e Frutos do Mar">🦐 Pescados e Frutos do Mar</option>
+                                    <option value="Massas e Risotos">🍝 Massas e Risotos</option>
+                                    <option value="Queijos e Embutidos">🧀 Queijos e Embutidos</option>
+                                    <option value="Vegetariano / Vegano">🥗 Vegetariano / Vegano</option>
+                                    <option value="Doces e Chocolates">🍫 Doces e Chocolates</option>
+                                    <option value="Variados / Menu Completo">🍽️ Variados / Menu Completo</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1.5 pl-1">3. Detalhes Específicos (Opcional)</label>
+                            <input type="text" id="global-pairing-details" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-3 text-white text-sm focus:border-blue-600 outline-none placeholder-stone-600 shadow-inner" placeholder="Ex: Risoto de Funghi, Churrasco, Comida Japonesa...">
+                        </div>
+                    </div>
+                    
+                    <button id="analyze-global-pairing-btn" class="w-full mt-4 bg-blue-800 hover:bg-blue-700 transition-colors text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-xs flex items-center justify-center gap-2 active:scale-95">
+                        <span>🧠</span> Analisar Adega Completa
+                    </button>
+                </div>`;
+            
+            openModal();
+            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+
+            modalContent.querySelector('#analyze-global-pairing-btn').onclick = () => { 
+                const occasion = document.getElementById('global-pairing-occasion').value;
+                const category = document.getElementById('global-pairing-category').value;
+                const details = document.getElementById('global-pairing-details').value.trim();
+                
+                let finalTheme = `Ocasião: ${occasion} | Categoria Principal: ${category}`;
+                if (details) finalTheme += ` | Prato ou Detalhe Específico: ${details}`;
+                
+                generateDinnerMenu(finalTheme);
+            };
+        }
+
+        async function generateDinnerMenu(promptTheme) {
+            showLoadingModal('Cruzando dados da adega com a enologia...');
+            try {
+                const stock = currentWines.filter(w=>w.quantity>0).map(w => `- ${w.wineName} (${w.grape}, ${w.region})`).join('\n');
+                const prompt = `Atue como Master Sommelier. Dados Estruturados do Evento: "${promptTheme}". 
+                Estoque da adega do usuário:\n${stock}\n
+                Crie cardápio sugerido (Entrada, Principal, Sobremesa) OU sugestões pontuais baseadas nestes dados. 
+                Harmonize EXCLUSIVAMENTE com a adega e justifique com A VERDADE TÉCNICA dos taninos/acidez de cada vinho escolhido. HTML (<h3>, <p>, <ul>, <li>). Sem saudações.`;
+                const resp = await callGenerativeAI(prompt);
+                
+                modalContent.innerHTML = `
+                    ${getModalHeader('Menu Harmonizado', '🍽️', true)}
+                    <div class="px-4 pb-4 text-stone-300 space-y-4 max-h-[55vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-base [&>h3]:mt-4 [&>h3]:border-b [&>h3]:border-stone-800 [&>h3]:pb-1 [&>ul]:list-disc [&>ul]:pl-5 [&>li]:text-xs [&>p]:text-xs">
+                        <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/20 border border-blue-800/30 p-3 rounded-xl mb-4 text-center shadow-inner">
+                            <span class="text-[9px] text-blue-400 uppercase tracking-widest font-bold block mb-1">Parâmetros Analisados</span>
+                            <span class="text-xs text-white leading-tight block">${promptTheme}</span>
+                        </div>
+                        ${resp}
+                    </div>`;
+                
+                modalContent.querySelector('.back-modal-btn').onclick = openDinnerPlannerModal;
+            } catch (error) { 
+                showErrorModal(error.message); 
+            } finally { 
+                hideLoadingModal(); 
+            }
+        }
+
+        // ===================================================================================
+        // 13. CHAT E SUGESTÃO SURPRESA
+        // ===================================================================================
         function openChatModal() {
             const chatHistory = [{ role: 'ai', text: 'Sommelier online. Fatos e verdades enológicas. Como harmonizamos hoje?' }];
             modalContent.innerHTML = `
@@ -925,84 +1029,16 @@
         }
 
         // ===================================================================================
-        // 12. NOVA FUNÇÃO ATUALIZADA: Painel Global de Harmonização (COM CAMPO SELECIONÁVEL)
+        // 14. INICIALIZAÇÃO DE LISTENERS
         // ===================================================================================
-        function openDinnerPlannerModal() {
-            if (currentWines.length === 0) return showErrorModal("Sem vinhos na adega para harmonizar.");
-            
-            modalContent.innerHTML = `
-                ${getModalHeader('Harmonizar Adega', '🍽️')}
-                <div class="px-4 pb-6">
-                    <p class="text-stone-400 text-xs mb-6 text-center">Selecione a ocasião ou o estilo do prato no formulário para que o Sommelier crie um menu harmonizado cruzando com todo o seu inventário de vinhos.</p>
-                    
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 pl-1">Tipo de Refeição / Ocasião</label>
-                            <select id="global-occasion-select" class="w-full bg-stone-900 border border-stone-700 rounded-xl p-4 text-white text-sm focus:border-blue-600 outline-none appearance-none cursor-pointer shadow-md">
-                                <option value="" disabled selected>Escolha uma opção na lista...</option>
-                                <option value="Almoço (Leve / Carnes Brancas)">☀️ Almoço (Leve / Carnes Brancas)</option>
-                                <option value="Almoço (Pesado / Carnes Vermelhas)">🥩 Almoço (Pesado / Carnes Vermelhas)</option>
-                                <option value="Jantar Romântico">🕯️ Jantar Romântico</option>
-                                <option value="Jantar de Negócios">🤝 Jantar de Negócios / Formal</option>
-                                <option value="Salgados e Petiscos">🥨 Salgados e Petiscos (Happy Hour)</option>
-                                <option value="Doces e Sobremesas">🍮 Doces e Sobremesas</option>
-                                <option value="Outro">✨ Outra opção (Especificar...)</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 top-[26px] flex items-center px-4 text-stone-400">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-                        
-                        <div id="global-custom-container" class="hidden transition-all duration-300">
-                            <label class="block text-[10px] font-bold text-stone-500 uppercase tracking-widest mb-2 pl-1">Especifique o Prato ou Ocasião</label>
-                            <input type="text" id="global-custom-input" class="w-full bg-stone-950 border border-stone-700 rounded-xl p-4 text-white text-sm focus:border-blue-600 outline-none placeholder-stone-600 shadow-inner" placeholder="Ex: Frutos do Mar, Menu Degustação Asiático...">
-                        </div>
-                        
-                        <button id="global-submit-btn" class="w-full bg-blue-800 hover:bg-blue-700 transition-colors text-white font-bold py-4 rounded-xl shadow-lg uppercase tracking-widest text-xs mt-2">Criar Menu Harmonizado</button>
-                    </div>
-                </div>`;
-            
-            openModal();
-            modalContent.querySelector('.close-modal-btn').onclick = closeModal;
+        document.getElementById('api-monitor').addEventListener('click', function() { this.classList.toggle('is-expanded'); });
+        document.getElementById('add-wine-action-btn').addEventListener('click', showImageSourceModal);
+        document.getElementById('camera-input').addEventListener('change', handleImageUpload);
+        document.getElementById('gallery-input').addEventListener('change', handleImageUpload);
+        document.getElementById('ask-sommelier-btn').addEventListener('click', openChatModal);
+        document.getElementById('btn-surprise-me').addEventListener('click', suggestWineForTonight);
+        document.getElementById('btn-dinner-planner').addEventListener('click', openDinnerPlannerModal);
 
-            const occasionSelect = modalContent.querySelector('#global-occasion-select');
-            const customContainer = modalContent.querySelector('#global-custom-container');
-            const customInput = modalContent.querySelector('#global-custom-input');
-            const submitBtn = modalContent.querySelector('#global-submit-btn');
-
-            occasionSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'Outro') {
-                    customContainer.classList.remove('hidden');
-                    customInput.focus();
-                } else {
-                    customContainer.classList.add('hidden');
-                }
-            });
-
-            submitBtn.addEventListener('click', () => { 
-                let selectedValue = occasionSelect.value;
-                if (!selectedValue) {
-                    alert("Por favor, selecione uma opção de harmonização no campo selecionável.");
-                    return;
-                }
-                if (selectedValue === 'Outro') {
-                    selectedValue = customInput.value.trim();
-                    if (!selectedValue) {
-                        alert("Por favor, especifique o prato ou ocasião no campo de texto.");
-                        return;
-                    }
-                }
-                generateDinnerMenu(selectedValue);
-            });
-        }
-
-        async function generateDinnerMenu(theme) {
-            showLoadingModal('Aplicando regras da enologia...');
-            try {
-                const stock = currentWines.filter(w=>w.quantity>0).map(w => `- ${w.wineName} (${w.grape}, ${w.region})`).join('\n');
-                const prompt = `Tema: "${theme}". Estoque da adega:\n${stock}\nCrie cardápio (Entrada, Principal, Sobremesa) OU sugestões pontuais se for lanche/doces. Harmonize EXCLUSIVAMENTE com a adega e diga A VERDADE TÉCNICA. HTML (<h3>, <p>, <ul>, <li>).`;
-                const resp = await callGenerativeAI(prompt);
-                
-                modalContent.innerHTML = `
-                    ${getModalHeader('Menu Harmonizado', '🍽️', true)}
-                    <div class="px-4 pb-4 text-stone-300 space-y-3 max-h-[55vh] overflow-y-auto custom-scrollbar [&>h3]:text-white [&>h3]:font-serif [&>h3]:text-base [&>h3]:mt-4 [&>ul]:list-disc [&>
+    </script>
+</body>
+</html>
