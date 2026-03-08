@@ -94,7 +94,7 @@
         <!-- Header Premium Compacto Mobile -->
         <header class="text-center mt-2 mb-6 flex-shrink-0 relative">
             <h1 class="font-serif text-4xl md:text-5xl text-white tracking-tight font-bold drop-shadow-[0_2px_10px_rgba(159,18,57,0.8)]">
-                Adega da Teresinha
+                Adega EID VALÊNCIO
             </h1>
             <div class="mx-auto mt-2 w-16 h-0.5 bg-red-800 rounded-full opacity-80"></div>
         </header>
@@ -553,7 +553,7 @@
         }
 
         // ===================================================================================
-        // 10. TELAS DO MODAL COM HEADER FIXO (MOBILE FIRST)
+        // 10. TELAS DO MODAL COM HEADER FIXO (MOBILE FIRST) E PROCESSAMENTO DE IMAGEM
         // ===================================================================================
         
         const getModalHeader = (title, icon = '', showBackBtn = false) => `
@@ -590,11 +590,24 @@
             modalContent.querySelector('#open-gallery-btn').onclick = () => { document.getElementById('gallery-input').click(); closeModal(); };
         }
 
+        // === CORREÇÃO: Função toBase64 implementada ===
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                // A API do Gemini precisa apenas da string limpa, sem o prefixo data:image/jpeg;base64,
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = error => reject(error);
+        });
+
         async function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             showLoadingModal('Analisando rótulo com IA...');
             try {
+                // Agora o toBase64 irá funcionar perfeitamente
                 const base64Image = await toBase64(file);
                 const prompt = `Extraia dados visíveis no rótulo. Retorne JSON: "wineName", "grape" (só verdade), "region", "year" (numero ou null), "description" (max 150 carac, factual), "foodPairings" (array de 3 strings, clássicas). Null se invisível.`;
                 const jsonResponse = await callGenerativeAI(prompt, base64Image, true);
@@ -853,3 +866,4 @@
     </script>
 </body>
 </html>
+
